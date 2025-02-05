@@ -100,6 +100,38 @@ namespace ListaTarefasAPI.Controllers
             return NoContent();
         }
 
+        // PATCH: api/Tarefas/Concluir/5
+        [HttpPatch("Concluir/{id}")]
+        public async Task<IActionResult> ConcluirTarefa(int id)
+        {
+            var tarefa = await _context.Tarefas.FindAsync(id);
+            if (tarefa == null)
+            {
+                return NotFound();
+            }
+
+            tarefa.Concluida = true;
+            _context.Entry(tarefa).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TarefaExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
         private bool TarefaExists(int id)
         {
             return _context.Tarefas.Any(e => e.TarefaId == id);
